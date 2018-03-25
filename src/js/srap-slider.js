@@ -26,8 +26,8 @@ class SrapSlider {
         for(let slide of this.slides) {
             slide.style.transitionDuration = `${this.slideSpeed}s`;
             slide.style.animationDuration = `${this.slideSpeed}s`;
-            slide.style.transitionTimingFunction = `${timingFunction}`;
-            slide.style.animationTimingFunction = `${timingFunction}`;
+            slide.style.transitionTimingFunction = timingFunction;
+            slide.style.animationTimingFunction = timingFunction;
         }
 
         this.sliderAutoSlide();
@@ -66,7 +66,7 @@ class SrapSlider {
         this.indicatorsClick = this.indicatorsClick.bind(this);
 
         this.nextBtn.addEventListener('click', this.toRight);
-        this.prevBtn.addEventListener('click', this.toLeft);
+        this.prevBtn.addEventListener('click', this.toLeft); 
         for(let indicator of this.indicators) {
             indicator.addEventListener('click', this.indicatorsClick);
         }
@@ -99,7 +99,6 @@ class SrapSlider {
         setTimeout(() => {
             this.addEvent();
         }, this.timeoutDuration);
-        console.log(typeof eventObject);
         this.restartAutoSlide(eventObject);
     }
 

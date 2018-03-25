@@ -31,12 +31,18 @@ const webpackConfig = {
       {
         test: /\.scss$/,
         use: extractSass.extract({
-          use: [{
-              loader: "css-loader"
-          }, {
+          use: [
+            {
+              loader: "css-loader",
+            },
+            {
+              loader: "postcss-loader"
+            },
+            {
               loader: "sass-loader"
-          }],
-          fallback: "style-loader"
+            }
+          ],
+          fallback: "style-loader",
         })
       }
     ]

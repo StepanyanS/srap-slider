@@ -9,7 +9,7 @@ const extractSass = new ExtractTextPlugin({
 const webpackConfig = {
   context: path.resolve(__dirname, 'src'),
 
-  entry: './js/srap-slider.js',
+  entry: ['./js/srap-slider.js'],
   output: {
       path: path.resolve(__dirname, 'dist'),
       filename: 'srap-slider.min.js',

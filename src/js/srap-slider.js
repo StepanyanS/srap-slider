@@ -23,11 +23,11 @@ class SrapSlider {
         this.timeoutDuration = speed * 1000 + 100;
         this.interval = interval * 1000; // slide interval
 
-        for(let slide of this.slides) {
-            slide.style.transitionDuration = `${this.slideSpeed}s`;
-            slide.style.animationDuration = `${this.slideSpeed}s`;
-            slide.style.transitionTimingFunction = timingFunction;
-            slide.style.animationTimingFunction = timingFunction;
+        for(let i = 0; i < this.slides.length; i++) {
+            this.slides[i].style.transitionDuration = `${this.slideSpeed}s`;
+            this.slides[i].style.animationDuration = `${this.slideSpeed}s`;
+            this.slides[i].style.transitionTimingFunction = timingFunction;
+            this.slides[i].style.animationTimingFunction = timingFunction;
         }
 
         this.sliderAutoSlide();
@@ -66,9 +66,10 @@ class SrapSlider {
         this.indicatorsClick = this.indicatorsClick.bind(this);
 
         this.nextBtn.addEventListener('click', this.toRight);
-        this.prevBtn.addEventListener('click', this.toLeft); 
-        for(let indicator of this.indicators) {
-            indicator.addEventListener('click', this.indicatorsClick);
+        this.prevBtn.addEventListener('click', this.toLeft);
+
+        for(let i = 0; i < this.indicators.length; i++) {
+            this.indicators[i].addEventListener('click', this.indicatorsClick);
         }
 
         window.addEventListener('resize', () => {
@@ -80,69 +81,113 @@ class SrapSlider {
     removeEvent() {
         this.nextBtn.removeEventListener('click', this.toRight);
         this.prevBtn.removeEventListener('click', this.toLeft);
-        for(let indicator of this.indicators) {
-            indicator.removeEventListener('click', this.indicatorsClick);
+        for(let i = 0; i < this.indicators.length; i++) {
+            this.indicators[i].removeEventListener('click', this.indicatorsClick);
         }
     }
 
     toRight(eventObject) {
+        
         this.slideDirection = 'toRight';
+
         this.changeIndicator(this.activeIndex);
-        this.slides[this.checkIndex(this.activeIndex - 1)].classList.remove('active-prev', 'active-next');
-        this.slides[this.checkIndex(this.activeIndex + 1)].classList.remove('active-next', 'active-prev');
-        this.slides[this.activeIndex].classList.remove('active-default', 'active-from-right', 'active-from-left');
+
+        this.slides[this.checkIndex(this.activeIndex - 1)].classList.remove('active-prev');
+        this.slides[this.checkIndex(this.activeIndex - 1)].classList.remove('active-next');
+
+        this.slides[this.checkIndex(this.activeIndex + 1)].classList.remove('active-prev');
+        this.slides[this.checkIndex(this.activeIndex + 1)].classList.remove('active-next');
+
+        this.slides[this.activeIndex].classList.remove('active-default');
+        this.slides[this.activeIndex].classList.remove('active-from-left');
+        this.slides[this.activeIndex].classList.remove('active-from-right');
+
         this.slides[this.activeIndex].classList.add('active-prev');
+
         if(this.activeIndex === this.slides.length - 1) this.activeIndex = 0;
         else this.activeIndex++;
+
         this.slides[this.activeIndex].classList.add('active-from-right');
+
         this.removeEvent();
+
         setTimeout(() => {
             this.addEvent();
         }, this.timeoutDuration);
+
         this.restartAutoSlide(eventObject);
     }
 
     toLeft(eventObject) {
         this.slideDirection = 'toLeft';
+
         this.changeIndicator(this.activeIndex);
-        this.slides[this.checkIndex(this.activeIndex - 1)].classList.remove('active-prev', 'active-next');
-        this.slides[this.checkIndex(this.activeIndex + 1)].classList.remove('active-next', 'active-prev');
-        this.slides[this.activeIndex].classList.remove('active-default', 'active-from-right', 'active-from-left');
+
+        this.slides[this.checkIndex(this.activeIndex - 1)].classList.remove('active-prev');
+        this.slides[this.checkIndex(this.activeIndex - 1)].classList.remove('active-next');
+
+        this.slides[this.checkIndex(this.activeIndex + 1)].classList.remove('active-prev');
+        this.slides[this.checkIndex(this.activeIndex + 1)].classList.remove('active-next');
+
+        this.slides[this.activeIndex].classList.remove('active-default');
+        this.slides[this.activeIndex].classList.remove('active-from-left');
+        this.slides[this.activeIndex].classList.remove('active-from-right');
+
         this.slides[this.activeIndex].classList.add('active-next');
+
         if(this.activeIndex == 0) this.activeIndex = this.slides.length - 1;
         else this.activeIndex--;
+
         this.slides[this.activeIndex].classList.add('active-from-left');
+
         this.removeEvent();
+
         setTimeout(() => {
             this.addEvent();
         }, this.timeoutDuration);
+
         this.restartAutoSlide(eventObject);
     }
 
     indicatorsClick(eventObject) {
         this.changeIndicator(eventObject);
+
         if(+eventObject.target.dataset.indicatorIndex == this.activeIndex) return false;
+
         let toLeft = false;
         if(+eventObject.target.dataset.indicatorIndex < this.activeIndex) toLeft = true;
+
         this.slides[this.checkIndex(this.activeIndex - 1)].classList.remove('active-prev');
+        this.slides[this.checkIndex(this.activeIndex - 1)].classList.remove('active-next');
+
         this.slides[this.checkIndex(this.activeIndex + 1)].classList.remove('active-next');
-        this.slides[this.activeIndex].classList.remove('active-default', 'active-from-right', 'active-from-left');
+        this.slides[this.checkIndex(this.activeIndex + 1)].classList.remove('active-prev');
+
+        this.slides[this.activeIndex].classList.remove('active-default');
+        this.slides[this.activeIndex].classList.remove('active-from-left');
+        this.slides[this.activeIndex].classList.remove('active-from-right');
+
         if(!toLeft) {
             this.slides[this.activeIndex].classList.add('active-prev');
             this.activeIndex = +eventObject.target.dataset.indicatorIndex;
-            this.slides[this.activeIndex].classList.remove('active-prev', 'active-next');
+            this.slides[this.activeIndex].classList.remove('active-prev');
+            this.slides[this.activeIndex].classList.remove('active-next');
             this.slides[this.activeIndex].classList.add('active-from-right');
         }
         else {
             this.slides[this.activeIndex].classList.add('active-next');
             this.activeIndex = +eventObject.target.dataset.indicatorIndex;
-            this.slides[this.activeIndex].classList.remove('active-prev', 'active-next');
+            this.slides[this.activeIndex].classList.remove('active-prev');
+            this.slides[this.activeIndex].classList.remove('active-next');
             this.slides[this.activeIndex].classList.add('active-from-left');
         }
+
         this.removeEvent();
+
         setTimeout(() => {
             this.addEvent();
         }, this.timeoutDuration);
+
         this.restartAutoSlide(eventObject);
     }
 

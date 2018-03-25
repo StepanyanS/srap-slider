@@ -1,20 +1,27 @@
+import '../scss/srap-slider.scss';
+
 class SrapSlider {
     
-    constructor (speed = 1, timingFunction = 'ease-in-out') {
-        this.sliderInit(speed, timingFunction);
+    constructor (speed = 1, interval = 4, timingFunction = 'ease-in-out') {
+        this.sliderInit(speed, interval, timingFunction);
         this.indicatorsInit();
         this.addEvent();
     }
 
-    sliderInit(speed, timingFunction) {
+    sliderInit(speed, interval, timingFunction) {
         this.srapSlider = document.querySelector('.srap-slider');
         this.prevBtn = document.querySelector('.prevBtn');
         this.nextBtn = document.querySelector('.nextBtn');
         this.slides = document.querySelectorAll('.srap-slider .slide');
+        this.imgHeight = document.querySelector('.srap-slider .slide img').clientHeight;
+        this.srapSlider.style.height = `${this.imgHeight}px`;
+
         this.activeIndex = 0;
         this.slideDirection = 'toRight';
+
         this.slideSpeed = speed; // second
         this.timeoutDuration = speed * 1000 + 100;
+        this.interval = interval * 1000; // slide interval
 
         for(let slide of this.slides) {
             slide.style.transitionDuration = `${this.slideSpeed}s`;
@@ -23,14 +30,24 @@ class SrapSlider {
             slide.style.animationTimingFunction = `${timingFunction}`;
         }
 
-        // this.sliderAutoSlide();
+        this.sliderAutoSlide();
     }
 
-    // sliderAutoSlide() {
-    //     this.autoSlide = setInterval(() => {
-    //         this.toRight();
-    //     }, 4000);
-    // }
+    sliderAutoSlide() {
+        this.autoSlide = setInterval(() => {
+            this.toRight();
+        }, this.interval);
+    }
+
+    restartAutoSlide(eventObject) {
+        if(typeof eventObject == 'object') {
+            clearInterval(this.autoSlide);
+            clearTimeout(this.autoSlideTimout);
+            this.autoSlideTimout = setTimeout(() => {
+                this.sliderAutoSlide()
+            }, this.interval);
+        }
+    }
 
     indicatorsInit() {
         this.sliderIndicators = document.querySelector('.slider-indicators');
@@ -53,6 +70,11 @@ class SrapSlider {
         for(let indicator of this.indicators) {
             indicator.addEventListener('click', this.indicatorsClick);
         }
+
+        window.addEventListener('resize', () => {
+            this.imgHeight = document.querySelector('.srap-slider .slide img').clientHeight;
+            this.srapSlider.style.height = `${this.imgHeight}px`;
+        });
     }
 
     removeEvent() {
@@ -63,8 +85,7 @@ class SrapSlider {
         }
     }
 
-    toRight() {
-        // clearInterval(this.autoSlide);
+    toRight(eventObject) {
         this.slideDirection = 'toRight';
         this.changeIndicator(this.activeIndex);
         this.slides[this.checkIndex(this.activeIndex - 1)].classList.remove('active-prev', 'active-next');
@@ -78,19 +99,15 @@ class SrapSlider {
         setTimeout(() => {
             this.addEvent();
         }, this.timeoutDuration);
-        // setTimeout(() => {
-        //     this.autoSlide = setInterval(() => {
-        //         this.toRight();
-        //     }, 4000);
-        // }, 4000);
+        console.log(typeof eventObject);
+        this.restartAutoSlide(eventObject);
     }
 
-    toLeft() {
-        // clearInterval(this.autoSlide);
+    toLeft(eventObject) {
         this.slideDirection = 'toLeft';
         this.changeIndicator(this.activeIndex);
-        this.slides[this.checkIndex(this.activeIndex - 1)].classList.remove('active-prev');
-        this.slides[this.checkIndex(this.activeIndex + 1)].classList.remove('active-next');
+        this.slides[this.checkIndex(this.activeIndex - 1)].classList.remove('active-prev', 'active-next');
+        this.slides[this.checkIndex(this.activeIndex + 1)].classList.remove('active-next', 'active-prev');
         this.slides[this.activeIndex].classList.remove('active-default', 'active-from-right', 'active-from-left');
         this.slides[this.activeIndex].classList.add('active-next');
         if(this.activeIndex == 0) this.activeIndex = this.slides.length - 1;
@@ -100,11 +117,7 @@ class SrapSlider {
         setTimeout(() => {
             this.addEvent();
         }, this.timeoutDuration);
-        // setTimeout(() => {
-        //     this.autoSlide = setInterval(() => {
-        //         this.toRight();
-        //     }, 4000);
-        // }, 4000);
+        this.restartAutoSlide(eventObject);
     }
 
     indicatorsClick(eventObject) {
@@ -131,14 +144,15 @@ class SrapSlider {
         setTimeout(() => {
             this.addEvent();
         }, this.timeoutDuration);
+        this.restartAutoSlide(eventObject);
     }
 
-    changeIndicator(eventObject) {
-        if(typeof eventObject == 'object') {
+    changeIndicator(data) {
+        if(typeof data == 'object') {
             this.indicators[this.activeIndex].classList.remove('indicator-active');
-            this.indicators[eventObject.target.dataset.indicatorIndex].classList.add('indicator-active');
+            this.indicators[data.target.dataset.indicatorIndex].classList.add('indicator-active');
         }
-        else if(typeof eventObject == 'number') {
+        else if(typeof data == 'number') {
             this.indicators[this.activeIndex].classList.remove('indicator-active');
             (this.slideDirection == 'toRight') ? this.indicators[this.checkIndex(this.activeIndex + 1)].classList.add('indicator-active') : (this.slideDirection == 'toLeft') ? this.indicators[this.checkIndex(this.activeIndex - 1)].classList.add('indicator-active') : this.error = true;
         }
@@ -151,4 +165,4 @@ class SrapSlider {
     }
 }
 
-new SrapSlider(1, 'ease-in-out');
+new SrapSlider(1, 4, 'ease-in-out');
